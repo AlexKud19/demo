@@ -1,21 +1,25 @@
 package account
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand/v2"
 	"net/url"
+	"time"
 
 	"github.com/fatih/color"
 )
 
 type Account struct {
-	login    string
-	password string
-	url      string
+	Login     string    `json:"login"`
+	Password  string    `json:"password"`
+	Url       string    `json:"url"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdateAt  time.Time `json:"updateAt"`
 }
 
 func (acc *Account) OutputData() {
-	color.Red("%v, %v, %v", acc.login, acc.password, acc.url)
+	color.Red("%v, %v, %v", acc.Login, acc.Password, acc.Url)
 }
 
 func (acc *Account) generatePassword(n int) {
@@ -27,7 +31,11 @@ func (acc *Account) generatePassword(n int) {
 	for i := range n {
 		res[i] = chars[rand.IntN(93)]
 	}
-	acc.password = string(res)
+	acc.Password = string(res)
+}
+
+func (acc *Account) ToBytes() ([]byte, error) {
+	return json.Marshal(acc)
 }
 
 func NewAccount(login, password, urlData string) (*Account, error) {
@@ -39,10 +47,15 @@ func NewAccount(login, password, urlData string) (*Account, error) {
 		return nil, fmt.Errorf("invalid url")
 	}
 	newAcc := &Account{
-		login:    login,
-		password: password,
-		url:      urlData,
+		CreatedAt: time.Now(),
+		UpdateAt:  time.Now(),
+		Login:     login,
+		Password:  password,
+		Url:       urlData,
 	}
+	// field, _ := reflect.TypeOf(newAcc).Elem().FieldByName("login")
+	// fmt.Println(field.Tag)
+	// fmt.Println(string(field.Tag))
 	if password == "" {
 		newAcc.generatePassword(8)
 	}

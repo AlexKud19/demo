@@ -2,10 +2,17 @@ package main
 
 import (
 	"demo/password/account"
+	"demo/password/files"
 	"fmt"
 )
 
 func main() {
+	// files.WriteFile("Hello! I am file", "file.txt")
+	// files.ReadFile("file.txt")
+	createAccaunt()
+}
+
+func createAccaunt() {
 	login := promptData("Введите логин")
 	password := promptData("Введите пароль")
 	url := promptData("Введите url")
@@ -14,8 +21,13 @@ func main() {
 		fmt.Printf("Error: %v\n", err)
 		return
 	}
-	fmt.Println(myAccount)
 	myAccount.OutputData()
+	file, err := myAccount.ToBytes()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return
+	}
+	files.WriteFile(file, "data.json")
 }
 
 func promptData(text string) string {
